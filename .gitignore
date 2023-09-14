@@ -1,3 +1,8 @@
+# Media files
+*.mp3
+*.mp4
+/res/
+
 # Prerequisites
 *.d
 
