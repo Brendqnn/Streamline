@@ -14,7 +14,7 @@
 typedef struct SLcompressor {
     AVFrame *frame;
     AVPacket packet;
-    AVPacket audio_packet;
+    //AVPacket audio_packet;
 
     SLio *io;
     SLcodec *codec;

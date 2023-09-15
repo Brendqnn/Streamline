@@ -6,7 +6,7 @@
 #include <libavformat/avformat.h>
 
 
-typedef struct SLio {
+typedef struct {
     const char *input_media_filename;
     //const char *output_media_filename;
 

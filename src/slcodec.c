@@ -36,6 +36,9 @@ void find_media_streams(SLcodec *codec, SLio *io)
             codec->audio_stream_idx = i;
         }
     }
+
+    printf("video stream idx: %d\n", codec->video_stream_idx);
+    printf("audio stream idx: %d\n", codec->audio_stream_idx);
     
     if (codec->video_stream_idx == -1) {
         printf("Error: Video stream index not found.\n");
@@ -105,11 +108,11 @@ void set_encoder_properties(SLcodec *codec)
     //codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
     //codec->video_encoder_ctx->rc_buffer_size = 4000000;
     
-    // Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
+    //Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
     //av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "23", 0);
     
-    // Set other properties like resolution, framerate, etc.
-    codec->video_encoder_ctx->bit_rate = codec->video_decoder_ctx->bit_rate;
+    //Set other properties like resolution, framerate, etc.
+    codec->video_encoder_ctx->bit_rate = codec->video_decoder_ctx->bit_rate - 20000;
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
     codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // or YUV422P
@@ -149,10 +152,8 @@ void open_audio_encoder_ctx(SLcodec *codec)
     codec->audio_encoder_ctx->bit_rate = 128000; // Adjust the bitrate as needed
     codec->audio_encoder_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP; // or AV_SAMPLE_FMT_S16P
     codec->audio_encoder_ctx->sample_rate = 44100; // Adjust the sample rate as needed
-    codec->audio_encoder_ctx->channels = 2; // Adjust the number of audio channels as needed
-    codec->audio_encoder_ctx->channel_layout = av_get_default_channel_layout(codec->audio_encoder_ctx->channels);
-    //codec->audio_encoder_ctx->codec_id = codec->audio_encoder->id;
-    
+    codec->audio_encoder_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
+        
     if (avcodec_open2(codec->audio_encoder_ctx, codec->audio_encoder, NULL) < 0) {
         printf("Error: Failed to open audio encoder codec.\n");
         return;
@@ -173,6 +174,7 @@ void stream_to_output(SLcodec *codec, SLio *io)
 {
     codec->output_video_stream = avformat_new_stream(io->output_ctx, NULL);
     codec->output_video_stream->time_base = codec->input_video_stream->time_base;
+    copy_audio_parameters(codec, io);
     if (!codec->output_video_stream) {
         printf("Error: Failed to allocate output video stream.\n");
         return;

@@ -9,6 +9,7 @@
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 #include <libavutil/opt.h>
+#include <libavutil/channel_layout.h>
 
 #include "slio.h"
 

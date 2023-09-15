@@ -24,9 +24,9 @@ void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io)
     open_media_input(io);
     find_media_streams(codec, io);
     open_decoder_ctx(codec);
-    open_audio_decoder_ctx(codec);
+    //open_audio_decoder_ctx(codec);
     open_encoder_ctx(codec);
-    open_audio_encoder_ctx(codec);
+    //open_audio_encoder_ctx(codec);
     alloc_output_ctx(io);
     stream_to_output(codec, io);
     write_file_header(io);
@@ -59,37 +59,21 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
                 }
             }
         } else if (compressor->packet.stream_index == codec->audio_stream_idx) {
-            // Handle audio packets separately using audio encoder context
-            if (avcodec_send_packet(codec->audio_decoder_ctx, &compressor->packet) < 0) {
-                printf("Error: Failed to send audio packet to decoder.\n");
+            // Write the audio packet directly to the output
+            if (av_interleaved_write_frame(io->output_ctx, &compressor->packet) < 0) {
+                printf("Error: Error writing audio packet to output.\n");
                 break;
-            }
-            int ret;
-            while ((ret = avcodec_receive_frame(codec->audio_decoder_ctx, compressor->frame)) >= 0) {
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                    printf("Error: Failed to return decoded audio frame data.\n");
-                    break;
-                }
-                if (avcodec_send_frame(codec->audio_encoder_ctx, compressor->frame) < 0) {
-                    printf("Error: Failed to send audio frame to the audio encoder.\n");
-                    break;
-                }
-                while (avcodec_receive_packet(codec->audio_encoder_ctx, &compressor->packet) >= 0) {
-                    if (av_interleaved_write_frame(io->output_ctx, &compressor->packet) < 0) {
-                        printf("Error: Error writing audio packet to output.\n");
-                        break;
-                    }
-                }
             }
         }
         av_packet_unref(&compressor->packet);
     }
-    av_frame_free(&compressor->frame);
+    av_write_trailer(io->output_ctx);
 }
 
 void free_compressor(SLcompressor *compressor)
 {
     if (compressor != NULL) {
+        av_frame_free(&compressor->frame);
         free_io(compressor->io);
         free_codec(compressor->codec);
         free(compressor);
