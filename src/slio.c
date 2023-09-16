@@ -8,9 +8,38 @@ SLio *init_io(const char *filename)
     io->input_ctx = NULL;
     io->output_ctx = NULL;
     io->input_media_filename = filename;
-    io->output_tag = "res/sl-corbin.mp4";
+    io->output_tag = "sl-";
         
     return io;
+}
+
+void insert_node(SLio *io, const char *data)
+{
+    SLioNode *new_node = malloc(sizeof(SLioNode));
+    new_node->data = data;
+    new_node->next = io->node_head;
+    io->node_head = new_node;
+}
+
+void remove_node(SLio *io, const char *data)
+{
+    SLioNode *current = io->node_head;
+    SLioNode *previous = NULL;
+
+    while (current != NULL) {
+        if (strcmp(current->data, data) == 0) {
+            if (previous == NULL) {
+                // Removing the head node
+                io->node_head = current->next;
+            } else {
+                previous->next = current->next;
+            }
+            free(current);
+            return; // Node found and removed
+        }
+        previous = current;
+        current = current->next;
+    }
 }
 
 void open_media_input(SLio *io)
@@ -48,7 +77,15 @@ void free_io(SLio *io)
     if (io != NULL) {
         avformat_close_input(&io->input_ctx);
         avformat_free_context(io->output_ctx);
+
+        // Free the linked list
+        SLioNode *current = io->node_head;
+        while (current != NULL) {
+            SLioNode *next = current->next;
+            free(current);
+            current = next;
+        }
+
         free(io);
     }
 }
-

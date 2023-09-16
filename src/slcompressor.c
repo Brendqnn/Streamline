@@ -55,7 +55,7 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
 
 void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
-    const int max_batch_size = 4;
+    const int max_batch_size = 6;
 
     AVPacket *packet_batch[max_batch_size];
     AVFrame *frame_batch[max_batch_size];

@@ -25,7 +25,7 @@ SLcodec *init_codec(SLio *io)
         
     return codec;
 }
-
+ 
 void find_media_streams(SLcodec *codec, SLio *io)
 {
     for (size_t i = 0; i < io->input_ctx->nb_streams; i++) {
@@ -60,7 +60,7 @@ void open_decoder_ctx(SLcodec *codec)
         return;
     }
     codec->video_decoder_ctx->thread_type = FF_THREAD_FRAME;
-    codec->video_decoder_ctx->thread_count = 3;
+    codec->video_decoder_ctx->thread_count = 2;
     if (avcodec_open2(codec->video_decoder_ctx, codec->video_decoder, NULL) < 0) {
         printf("Error: Failed to open video decoder codec.\n");
         return;
@@ -100,9 +100,9 @@ void open_audio_decoder_ctx(SLcodec *codec)
 
 void set_encoder_properties(SLcodec *codec)
 {
-    codec->video_encoder_ctx->rc_max_rate = 10000000;  // Higher bitrate for better quality
+    codec->video_encoder_ctx->rc_max_rate = 8000000;  // Higher bitrate for better quality
     codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
-    codec->video_encoder_ctx->rc_buffer_size = 10000000;
+    codec->video_encoder_ctx->rc_buffer_size = 8000000;
     
     //Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
     av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "14", 0);
@@ -111,12 +111,12 @@ void set_encoder_properties(SLcodec *codec)
     //Set other properties like resolution, framerate, etc.
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
-    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // or YUV422P
+    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
     codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
     codec->video_encoder_ctx->framerate = codec->input_video_framerate;
 
     codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
-    codec->video_encoder_ctx->thread_count = 3;
+    codec->video_encoder_ctx->thread_count = 2;
 }
 
 void open_encoder_ctx(SLcodec *codec)

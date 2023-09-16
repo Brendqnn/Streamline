@@ -1,17 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <threads.h>
 
 #define RAYGUI_IMPLEMENTATION
 #include "../include/raygui.h"
 #include "../include/raylib.h"
-#include "slcodec.h"
+#include "../include/util.h"
 
 #include "slio.h"
 #include "slcodec.h"
 #include "slcompressor.h"
-
-#define WINDOW_HEIGHT 1200
-#define WINDOW_WIDTH 800
 
 
 int main(void) {
@@ -23,7 +21,7 @@ int main(void) {
     
     SetTargetFPS(60);
 
-    SLio *io = init_io("res/corbin.m4v");
+    SLio *io = init_io("res/feel better.mp4");
     SLcodec *codec = init_codec(io);
     SLcompressor *compressor = init_compressor(io, codec);
             
