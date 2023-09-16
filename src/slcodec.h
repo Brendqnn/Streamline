@@ -14,7 +14,7 @@
 #include "slio.h"
 
 
-typedef struct SLcodec {
+typedef struct {
     const AVCodec *video_decoder;
     AVCodecContext *video_decoder_ctx;
 

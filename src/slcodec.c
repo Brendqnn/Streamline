@@ -36,9 +36,6 @@ void find_media_streams(SLcodec *codec, SLio *io)
             codec->audio_stream_idx = i;
         }
     }
-
-    printf("video stream idx: %d\n", codec->video_stream_idx);
-    printf("audio stream idx: %d\n", codec->audio_stream_idx);
     
     if (codec->video_stream_idx == -1) {
         printf("Error: Video stream index not found.\n");
@@ -103,16 +100,15 @@ void open_audio_decoder_ctx(SLcodec *codec)
 
 void set_encoder_properties(SLcodec *codec)
 {
-    //codec->video_encoder_ctx->bit_rate = 0;  // Set to 0 for VBR
-    //codec->video_encoder_ctx->rc_max_rate = 2000000;  // Max target bitrate (e.g., 2 Mbps)
-    //codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
-    //codec->video_encoder_ctx->rc_buffer_size = 4000000;
+    codec->video_encoder_ctx->rc_max_rate = 8000000;  // Higher bitrate for better quality
+    codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
+    codec->video_encoder_ctx->rc_buffer_size = 8000000;
     
     //Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
-    //av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "23", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "14", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "superfast", 0);
     
     //Set other properties like resolution, framerate, etc.
-    codec->video_encoder_ctx->bit_rate = codec->video_decoder_ctx->bit_rate - 20000;
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
     codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // or YUV422P

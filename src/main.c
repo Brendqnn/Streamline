@@ -26,11 +26,11 @@ int main(void) {
     SLio *io = init_io("res/feel better.mp4");
     SLcodec *codec = init_codec(io);
     SLcompressor *compressor = init_compressor(io, codec);
-        
+            
     while (!WindowShouldClose()) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), box)) {
             isDragging = true;
-            offset = (Vector2){ GetMouseX() - box.x, GetMouseY() - box.y };
+            offset = (Vector2){GetMouseX() - box.x, GetMouseY() - box.y};
         } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
             isDragging = false;
         }
