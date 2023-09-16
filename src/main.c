@@ -23,7 +23,7 @@ int main(void) {
     
     SetTargetFPS(60);
 
-    SLio *io = init_io("res/feel better.mp4");
+    SLio *io = init_io("res/corbin.m4v");
     SLcodec *codec = init_codec(io);
     SLcompressor *compressor = init_compressor(io, codec);
             

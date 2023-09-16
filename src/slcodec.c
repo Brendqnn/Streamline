@@ -60,7 +60,7 @@ void open_decoder_ctx(SLcodec *codec)
         return;
     }
     codec->video_decoder_ctx->thread_type = FF_THREAD_FRAME;
-    codec->video_decoder_ctx->thread_count = 4;
+    codec->video_decoder_ctx->thread_count = 3;
     if (avcodec_open2(codec->video_decoder_ctx, codec->video_decoder, NULL) < 0) {
         printf("Error: Failed to open video decoder codec.\n");
         return;
@@ -100,13 +100,13 @@ void open_audio_decoder_ctx(SLcodec *codec)
 
 void set_encoder_properties(SLcodec *codec)
 {
-    codec->video_encoder_ctx->rc_max_rate = 8000000;  // Higher bitrate for better quality
+    codec->video_encoder_ctx->rc_max_rate = 10000000;  // Higher bitrate for better quality
     codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
-    codec->video_encoder_ctx->rc_buffer_size = 8000000;
+    codec->video_encoder_ctx->rc_buffer_size = 10000000;
     
     //Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
     av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "14", 0);
-    av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "superfast", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "veryfast", 0);
     
     //Set other properties like resolution, framerate, etc.
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
@@ -116,7 +116,7 @@ void set_encoder_properties(SLcodec *codec)
     codec->video_encoder_ctx->framerate = codec->input_video_framerate;
 
     codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
-    codec->video_encoder_ctx->thread_count = 4;
+    codec->video_encoder_ctx->thread_count = 3;
 }
 
 void open_encoder_ctx(SLcodec *codec)
@@ -137,8 +137,7 @@ void open_audio_encoder_ctx(SLcodec *codec)
         printf("Error: Failed to find audio encoder.\n");
         return;
     }
-
-    // Initialize audio encoder context
+    
     codec->audio_encoder_ctx = avcodec_alloc_context3(codec->audio_encoder);
     if (!codec->audio_encoder_ctx) {
         printf("Error: Failed to allocate audio encoder context.\n");

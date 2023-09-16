@@ -8,7 +8,7 @@ SLio *init_io(const char *filename)
     io->input_ctx = NULL;
     io->output_ctx = NULL;
     io->input_media_filename = filename;
-    io->output_tag = "res/sl-feel better.mp4";
+    io->output_tag = "res/sl-corbin.mp4";
         
     return io;
 }
