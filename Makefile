@@ -1,5 +1,6 @@
-CFLAGS = -Wall -g -Iinclude
-LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lavformat -lavcodec -lavutil -lswscale
+CFLAGS = -Wall -g $(shell pkg-config --cflags gtk+-3.0)
+LDFLAGS = $(shell pkg-config --libs gtk+-3.0) -lavformat -lavcodec -lavutil -lswscale
+
 RUN_COMMAND = bin/debug/main.exe
 
 SOURCES = $(wildcard src/*.c)
