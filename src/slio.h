@@ -9,7 +9,7 @@
 typedef struct {
     const char *input_media_filename;
     const char *output_tag;
-        
+    
     AVFormatContext *input_ctx;
     AVFormatContext *output_ctx;
 } SLio;

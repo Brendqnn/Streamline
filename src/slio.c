@@ -9,7 +9,7 @@ SLio *init_io(const char *filename)
     io->output_ctx = NULL;
     io->input_media_filename = filename;
     io->output_tag = "sl-";
-        
+    
     return io;
 }
 

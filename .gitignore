@@ -4,6 +4,8 @@
 /res/
 *.txt
 
+# emacs
+
 # Prerequisites
 *.d
 
