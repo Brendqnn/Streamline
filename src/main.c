@@ -10,45 +10,78 @@
 
 #include <gtk/gtk.h>
 
-static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data) {
+const char* strip_str(const char* filename)
+{
+    return filename;
+}
+
+static void button_clicked(GtkWidget *widget, gpointer user_data)
+{
+    printf("Button clicked!\n");
+}
+
+static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y, GtkSelectionData *data,
+                                  guint info, guint time, gpointer user_data, GtkWidget *list_box, SLqueue *queue)
+{
     GList *uris_list = gtk_selection_data_get_uris(data);
 
     if (uris_list != NULL) {
         for (GList *iter = uris_list; iter != NULL; iter = iter->next) {
-            gchar *uri = (gchar *)iter->data;
-            gchar *filename = g_filename_from_uri(uri, NULL, NULL);
+            const char *uri = iter->data;
+            const char *filepath = g_filename_from_uri(uri, NULL, NULL);
 
-            if (filename != NULL) {
-                g_print("Dropped file: %s\n", filename);
+            if (filepath != NULL && queue != NULL) {
+                printf("Dropped file: %s\n", filepath);
+                SLqueue *queue = NULL;
+                insert_node(&queue, filepath);
 
-                // use SLqueue here to insert
-                
-                g_free(filename);
+                GtkWidget *label = gtk_label_new(filepath);
+                gtk_list_box_insert(GTK_LIST_BOX(list_box), label, -1);
+
+                // Free the filepath since it's no longer needed
+                g_free((gpointer)filepath);
             }
         }
-
         g_list_free(uris_list);
     }
 }
 
-void activate(GtkApplication *app, gpointer user_data) {
+void activate(GtkApplication *app, gpointer user_data)
+{
     GtkWidget *window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Streamline-v1.0");
     gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_HEIGHT, WINDOW_WIDTH);
 
-    GtkFixed *fixed_container = GTK_FIXED(gtk_fixed_new());
-    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(fixed_container));
+    GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(window), main_box);
 
-    g_signal_connect(G_OBJECT(fixed_container), "drag-data-received", G_CALLBACK(on_drag_data_received), NULL);
+    GtkWidget *button = gtk_button_new_with_label("Start");
+    g_signal_connect(button, "clicked", G_CALLBACK(button_clicked), NULL);
+    gtk_widget_set_size_request(button, 100, 40);
+    gtk_box_pack_start(GTK_BOX(main_box), button, FALSE, FALSE, 0);
+
+    GtkWidget *list_box = gtk_list_box_new();
+    gtk_box_pack_start(GTK_BOX(main_box), list_box, TRUE, TRUE, 0);
+    display(queue);
+
+    for (int i = 1; i <= 10; i++) {
+        char label_text[50];
+        sprintf(label_text, "Item %d", i);
+
+        GtkWidget *label = gtk_label_new(label_text);
+        gtk_list_box_insert(GTK_LIST_BOX(list_box), label, -1);
+    }
+    
+    g_signal_connect(G_OBJECT(window), "drag-data-received", G_CALLBACK(on_drag_data_received), queue);
 
     const GtkTargetEntry target_entries[] = {
         {"text/uri-list", 0, 0},
     };
 
-    gtk_drag_dest_set(fixed_container, GTK_DEST_DEFAULT_ALL, target_entries, G_N_ELEMENTS(target_entries), GDK_ACTION_COPY);
+    gtk_drag_dest_set(window, GTK_DEST_DEFAULT_ALL, target_entries, G_N_ELEMENTS(target_entries), GDK_ACTION_COPY);
 
-    gtk_widget_set_events(GTK_WIDGET(fixed_container), GDK_ALL_EVENTS_MASK);
-
+    gtk_widget_set_events(GTK_WIDGET(window), GDK_ALL_EVENTS_MASK);
+        
     gtk_widget_show_all(window);
 }
 
@@ -64,6 +97,7 @@ int main(int argc, char *argv[]) {
 
     return status;
 }
+
 
 
 
