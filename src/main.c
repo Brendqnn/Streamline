@@ -1,19 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <threads.h>
-
 #include "../include/util.h"
 #include "slio.h"
 #include "slcodec.h"
 #include "slcompressor.h"
 #include "slqueue.h"
-
 #include <gtk/gtk.h>
 
-const char* strip_str(const char* filename)
-{
-    return filename;
-}
 
 static void button_clicked(GtkWidget *widget, gpointer user_data)
 {
@@ -21,7 +15,7 @@ static void button_clicked(GtkWidget *widget, gpointer user_data)
 }
 
 static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y, GtkSelectionData *data,
-                                  guint info, guint time, gpointer user_data, GtkWidget *list_box, SLqueue *queue)
+                                  guint info, guint time, gpointer user_data)
 {
     GList *uris_list = gtk_selection_data_get_uris(data);
 
@@ -30,49 +24,45 @@ static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gi
             const char *uri = iter->data;
             const char *filepath = g_filename_from_uri(uri, NULL, NULL);
 
-            if (filepath != NULL && queue != NULL) {
+            if (filepath != NULL) {
                 printf("Dropped file: %s\n", filepath);
-                SLqueue *queue = NULL;
-                insert_node(&queue, filepath);
-
-                GtkWidget *label = gtk_label_new(filepath);
-                gtk_list_box_insert(GTK_LIST_BOX(list_box), label, -1);
-
-                // Free the filepath since it's no longer needed
-                g_free((gpointer)filepath);
+                
             }
         }
         g_list_free(uris_list);
     }
 }
 
-void activate(GtkApplication *app, gpointer user_data)
+static void activate(GtkApplication *app, gpointer user_data)
 {
-    GtkWidget *window = gtk_application_window_new(app);
+    SLqueue *queue = NULL;
+
+    GtkWidget *window;
+    GtkWidget *main_box;
+    GtkWidget *button;
+    GtkWidget *list_box;
+
+    const char *a_file = "whats gravy.mp4";
+
+    insert_node(&queue, "hello");
+    display_list(queue);
+    
+    window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Streamline-v1.0");
     gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_HEIGHT, WINDOW_WIDTH);
 
-    GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(window), main_box);
 
-    GtkWidget *button = gtk_button_new_with_label("Start");
+    button = gtk_button_new_with_label("Start");
     g_signal_connect(button, "clicked", G_CALLBACK(button_clicked), NULL);
     gtk_widget_set_size_request(button, 100, 40);
     gtk_box_pack_start(GTK_BOX(main_box), button, FALSE, FALSE, 0);
 
-    GtkWidget *list_box = gtk_list_box_new();
+    list_box = gtk_list_box_new();
     gtk_box_pack_start(GTK_BOX(main_box), list_box, TRUE, TRUE, 0);
-    display(queue);
 
-    for (int i = 1; i <= 10; i++) {
-        char label_text[50];
-        sprintf(label_text, "Item %d", i);
-
-        GtkWidget *label = gtk_label_new(label_text);
-        gtk_list_box_insert(GTK_LIST_BOX(list_box), label, -1);
-    }
-    
-    g_signal_connect(G_OBJECT(window), "drag-data-received", G_CALLBACK(on_drag_data_received), queue);
+    g_signal_connect(G_OBJECT(window), "drag-data-received", G_CALLBACK(on_drag_data_received), NULL);
 
     const GtkTargetEntry target_entries[] = {
         {"text/uri-list", 0, 0},
@@ -81,7 +71,7 @@ void activate(GtkApplication *app, gpointer user_data)
     gtk_drag_dest_set(window, GTK_DEST_DEFAULT_ALL, target_entries, G_N_ELEMENTS(target_entries), GDK_ACTION_COPY);
 
     gtk_widget_set_events(GTK_WIDGET(window), GDK_ALL_EVENTS_MASK);
-        
+
     gtk_widget_show_all(window);
 }
 
@@ -97,6 +87,8 @@ int main(int argc, char *argv[]) {
 
     return status;
 }
+
+
 
 
 

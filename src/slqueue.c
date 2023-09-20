@@ -1,29 +1,37 @@
 #include "slqueue.h"
 
-
-SLqueue *create_node(const char* value)
+SLqueue *create_node(const char* data)
 {
-    SLqueue *queue_node = malloc(sizeof(SLqueue));
-    if (queue_node == NULL) {
-        perror("Error: Failed to allocate memory for SLqueue.\n");
-        return NULL;
+    SLqueue *new_node = malloc(sizeof(SLqueue));
+    if (new_node == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
     }
-    
-    queue_node->data = value;
-    queue_node->next = NULL;
-    return queue_node;
+    new_node->data = data;
+    new_node->next = NULL;
+
+    return new_node;
 }
 
-void insert_node(SLqueue **head, const char* value)
+void insert_node(SLqueue **head, const char* data)
 {
-    SLqueue *queue_node = create_node(value);
-    queue_node->next = *head;
-    *head = queue_node;
+    SLqueue *new_node = create_node(data);
+    new_node->next = *head;
+    *head = new_node;
 }
 
-void display(SLqueue *head)
+void remove_node(SLqueue **head, const char* data)
 {
-    SLqueue *current = head;
+    if (*head != NULL) {
+        SLqueue *temp = *head;
+        *head = (*head)->next;
+        free(temp);
+    }
+}
+
+void display_list(SLqueue *queue)
+{
+    SLqueue *current = queue;
     while (current != NULL) {
         printf("%s -> ", current->data);
         current = current->next;
@@ -31,27 +39,5 @@ void display(SLqueue *head)
     printf("NULL\n");
 }
 
-void remove_node(SLqueue **head, const char* value)
-{
-    SLqueue *current = *head;
-    SLqueue *prev = NULL;
 
-    while (current != NULL && strcmp(current->data, value) != 0) {
-        prev = current;
-        current = current->next;
-    }
 
-    if (current == NULL) {
-        printf("Node with value '%s' not found in the list.\n", value);
-        return;
-    }
-
-    if (prev == NULL) {
-        // Node to be removed is the head of the list
-        *head = current->next;
-    } else {
-        prev->next = current->next;
-    }
-
-    free(current);
-}

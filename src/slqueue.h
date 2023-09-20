@@ -10,10 +10,12 @@ typedef struct SLqueue {
     struct SLqueue *next;
 } SLqueue;
 
-SLqueue *create_node(const char* value);
-void insert_node(SLqueue **head, const char* value);
-void display(SLqueue *head);
-void remove_node(SLqueue **head, const char* value);
+SLqueue *create_node(const char *data);
+void insert_node(SLqueue **head, const char *data);
+void remove_node(SLqueue **head, const char *data);
+void display_list(SLqueue *queue);
 
 #endif // SLQUEUE_H
+
+
 

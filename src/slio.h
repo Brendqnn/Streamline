@@ -12,12 +12,15 @@ typedef struct {
     
     AVFormatContext *input_ctx;
     AVFormatContext *output_ctx;
+    
 } SLio;
 
-SLio *init_io(const char *filename);
+SLio *init_io(const char* filename);
 void open_media_input(SLio *io);
 void write_file_header(SLio *io);
 void alloc_output_ctx(SLio *io);
+void insert_queue_node();
+void remove_queue_node();
 void free_io(SLio *io);
 
 #endif // SLIO_H
