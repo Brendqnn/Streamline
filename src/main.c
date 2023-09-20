@@ -11,12 +11,14 @@
 
 static void button_clicked(GtkWidget *widget, gpointer user_data)
 {
+    //display_list(queue);
     printf("Button clicked!\n");
 }
 
 static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y, GtkSelectionData *data,
                                   guint info, guint time, gpointer user_data)
 {
+    SLqueue *queue = NULL;
     GList *uris_list = gtk_selection_data_get_uris(data);
 
     if (uris_list != NULL) {
@@ -26,27 +28,23 @@ static void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gi
 
             if (filepath != NULL) {
                 printf("Dropped file: %s\n", filepath);
-                
+                insert_node(&queue, filepath);
             }
         }
         g_list_free(uris_list);
     }
+    display_list(queue);
 }
 
-static void activate(GtkApplication *app, gpointer user_data)
+static void activate(GtkApplication *app, gpointer user_data, SLqueue *queue)
 {
-    SLqueue *queue = NULL;
-
     GtkWidget *window;
     GtkWidget *main_box;
     GtkWidget *button;
     GtkWidget *list_box;
 
     const char *a_file = "whats gravy.mp4";
-
-    insert_node(&queue, "hello");
-    display_list(queue);
-    
+        
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Streamline-v1.0");
     gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_HEIGHT, WINDOW_WIDTH);
@@ -63,7 +61,7 @@ static void activate(GtkApplication *app, gpointer user_data)
     gtk_box_pack_start(GTK_BOX(main_box), list_box, TRUE, TRUE, 0);
 
     g_signal_connect(G_OBJECT(window), "drag-data-received", G_CALLBACK(on_drag_data_received), NULL);
-
+    
     const GtkTargetEntry target_entries[] = {
         {"text/uri-list", 0, 0},
     };
