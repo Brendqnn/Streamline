@@ -7,7 +7,12 @@ SLqueue *create_node(const char* data)
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
-    new_node->data = data;
+    new_node->data = malloc(strlen(data) + 1); // +1 for the null terminator
+    if (new_node->data == NULL) {
+        fprintf(stderr, "Memory allocation failed for data\n");
+        exit(1);
+    }
+    strcpy(new_node->data, data);
     new_node->next = NULL;
 
     return new_node;

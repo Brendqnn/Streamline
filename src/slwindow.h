@@ -3,15 +3,16 @@
 
 #include <gtk/gtk.h>
 #include "slqueue.h"
+#include "slio.h"
 
 typedef struct {
-    SLqueue *queue;
-    
     GtkWidget *window;
     GtkWidget *event_box;
+
+    SLio *io;
 } SLwindow;
 
-SLwindow *create_window(int height, int width, const char *title, SLqueue *queue);
+SLwindow *create_window(int height, int width, const char *title, SLio *io);
 void show_window(SLwindow *sl_window);
 void destroy_window(SLwindow *sl_window);
 

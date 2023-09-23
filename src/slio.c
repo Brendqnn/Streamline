@@ -1,14 +1,16 @@
 #include "slio.h"
 
 
-SLio *init_io(const char *filename)
+SLio *init_io()
 {
     SLio *io = malloc(sizeof(SLio));
 
     io->input_ctx = NULL;
     io->output_ctx = NULL;
-    io->input_media_filename = filename;
+    io->input_media_filename = NULL;
     io->output_tag = "sl-";
+
+    io->queue = NULL;
     
     return io;
 }
@@ -41,6 +43,11 @@ void alloc_output_ctx(SLio *io)
         printf("Error: Failed to allocate output context to output file.\n");
         return;
     }
+}
+
+void insert_queue_node(SLio *io)
+{
+    display_list(io->queue);
 }
 
 void free_io(SLio *io)

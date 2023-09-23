@@ -1,31 +1,38 @@
 #include "slwindow.h"
 
-void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data, SLqueue *queue) {
-    GList *uris_list = gtk_selection_data_get_uris(data);
-
-    if (uris_list != NULL && queue != NULL) {
+void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, gint y,
+                           GtkSelectionData *data, guint info, guint time, gpointer user_data)
+{
+    GList *uris_list = (GList*)gtk_selection_data_get_uris(data);
+    
+    if (uris_list != NULL) {
         for (GList *iter = uris_list; iter != NULL; iter = iter->next) {
             const char *uri = iter->data;
             const char *filepath = g_filename_from_uri(uri, NULL, NULL);
 
             if (filepath != NULL) {
                 printf("Dropped file: %s\n", filepath);
-                insert_node(&queue, filepath);
+                //insert_node(&io->queue, filepath);
             }
         }
         g_list_free(uris_list);
     }
+    
 }
 
-SLwindow *create_window(int width, int height, const char *title, SLqueue *queue) {
+SLwindow *create_window(int width, int height, const char *title, SLio *io) {
     SLwindow *sl_window = malloc(sizeof(SLwindow));
     if (sl_window == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(1);
     }
 
-    sl_window->queue = queue;
+    sl_window->io = io;
 
+    insert_node(&sl_window->io->queue, "hello");
+    
+    display_list(sl_window->io->queue);
+    
     gtk_init(NULL, NULL);
 
     sl_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -35,7 +42,7 @@ SLwindow *create_window(int width, int height, const char *title, SLqueue *queue
 
     sl_window->event_box = gtk_list_box_new();
     gtk_container_add(GTK_CONTAINER(sl_window->window), sl_window->event_box);
-    g_signal_connect(sl_window->window, "drag-data-received", G_CALLBACK(on_drag_data_received), queue);
+    g_signal_connect(sl_window->window, "drag-data-received", G_CALLBACK(on_drag_data_received), io);
     
     const GtkTargetEntry target_entries[] = {
         {"text/uri-list", 0, 0},
