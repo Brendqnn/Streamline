@@ -8,6 +8,7 @@
 typedef struct {
     GtkWidget *window;
     GtkWidget *event_box;
+    GtkWidget *button;
 
     SLio *io;
 } SLwindow;

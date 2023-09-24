@@ -45,9 +45,15 @@ void alloc_output_ctx(SLio *io)
     }
 }
 
-void insert_queue_node(SLio *io)
+void load_input(SLio *io)
 {
-    display_list(io->queue);
+    SLqueue *queue = io->queue;
+    if (queue != NULL) {
+        io->input_media_filename = queue->data;
+        printf("filename: %s\n", queue->data);
+    } else {
+        printf("Queue is empty...\n");
+    }
 }
 
 void free_io(SLio *io)
@@ -55,6 +61,7 @@ void free_io(SLio *io)
     if (io != NULL) {
         avformat_close_input(&io->input_ctx);
         avformat_free_context(io->output_ctx);
+        // TODO free list
         free(io);
     }
 }

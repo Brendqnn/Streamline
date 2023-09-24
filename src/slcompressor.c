@@ -24,9 +24,7 @@ void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io)
     open_media_input(io);
     find_media_streams(codec, io);
     open_decoder_ctx(codec);
-    //open_audio_decoder_ctx(codec);
     open_encoder_ctx(codec);
-    //open_audio_encoder_ctx(codec);
     alloc_output_ctx(io);
     stream_to_output(codec, io);
     write_file_header(io);
