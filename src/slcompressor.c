@@ -21,6 +21,7 @@ void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io)
         return;
     }
 
+    load_input(io);
     open_media_input(io);
     find_media_streams(codec, io);
     open_decoder_ctx(codec);
@@ -100,12 +101,12 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
     av_write_trailer(io->output_ctx);
 }
 
-void free_compressor(SLcompressor *compressor)
+void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
     if (compressor != NULL) {
         av_frame_free(&compressor->frame);
-        free_io(compressor->io);
-        free_codec(compressor->codec);
+        free_io(io);
+        free_codec(codec);
         free(compressor);
     }
 }

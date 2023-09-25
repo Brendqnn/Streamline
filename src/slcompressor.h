@@ -24,6 +24,6 @@ SLcompressor *init_compressor(SLio *io, SLcodec *codec);
 void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io);
 void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **frame_batch, int frame_count);
 void compress(SLcompressor *compressor, SLcodec *codec, SLio *io);
-void free_compressor(SLcompressor *compressor);
+void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io);
 
 #endif // SLCOMPRESSOR_H

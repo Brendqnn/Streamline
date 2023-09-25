@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include "slqueue.h"
 #include "slio.h"
+#include "slcompressor.h"
 
 typedef struct {
     GtkWidget *window;
@@ -11,6 +12,7 @@ typedef struct {
     GtkWidget *button;
 
     SLio *io;
+    SLcompressor *compressor;
 } SLwindow;
 
 SLwindow *create_window(int height, int width, const char *title, SLio *io);

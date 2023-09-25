@@ -8,7 +8,7 @@ SLio *init_io()
     io->input_ctx = NULL;
     io->output_ctx = NULL;
     io->input_media_filename = NULL;
-    io->output_tag = "sl-";
+    io->output_tag = "res/sl-corbin.mp4";
 
     io->queue = NULL;
     
@@ -44,13 +44,13 @@ void alloc_output_ctx(SLio *io)
         return;
     }
 }
-
+ 
 void load_input(SLio *io)
 {
     SLqueue *queue = io->queue;
     if (queue != NULL) {
         io->input_media_filename = queue->data;
-        printf("filename: %s\n", queue->data);
+        printf("filename from load_input: %s\n", queue->data);
     } else {
         printf("Queue is empty...\n");
     }
