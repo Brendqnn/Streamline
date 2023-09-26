@@ -119,11 +119,33 @@ void set_encoder_properties(SLcodec *codec)
     codec->video_encoder_ctx->thread_count = 2;
 }
 
+void set_nvenc_encoder_properties(SLcodec *codec)
+{
+    // Set NVENC encoder specific options
+    av_dict_set(codec->video_encoder_ctx->priv_data, "preset", "fast", 0); // Adjust the preset as needed
+    av_dict_set(codec->video_encoder_ctx->priv_data, "profile", "main", 0); // Adjust the profile as needed
+    av_dict_set(codec->video_encoder_ctx->priv_data, "level", "4.0", 0);   // Adjust the level as needed
+    av_dict_set(codec->video_encoder_ctx->priv_data, "rc-lookahead", "20", 0); // Adjust lookahead as needed
+    av_dict_set(codec->video_encoder_ctx->priv_data, "cbr", "0", 0); // Use VBR mode (1 for CBR)
+
+    // Set other properties like resolution, framerate, etc.
+    codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
+    codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
+    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_NV12; // NVENC requires NV12 format
+    codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
+    codec->video_encoder_ctx->framerate = codec->input_video_framerate;
+
+    codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
+    codec->video_encoder_ctx->thread_count = 2;
+}
+
 void open_encoder_ctx(SLcodec *codec)
 {
-    codec->video_encoder = avcodec_find_encoder(codec->input_video_stream->codecpar->codec_id);
+    //    codec->video_encoder = avcodec_find_encoder(codec->input_video_stream->codecpar->codec_id);
+    codec->video_encoder = avcodec_find_encoder_by_name("h264_nvenc");
     codec->video_encoder_ctx = avcodec_alloc_context3(codec->video_encoder);
-    set_encoder_properties(codec);
+    //    set_encoder_properties(codec);
+    set_nvenc_encoder_properties(codec);
     if (avcodec_open2(codec->video_encoder_ctx, codec->video_encoder, NULL) < 0) {
         printf("Error: Failed to open encoder codec.\n");
         return;
@@ -147,7 +169,7 @@ void open_audio_encoder_ctx(SLcodec *codec)
     codec->audio_encoder_ctx->bit_rate = 128000; // Adjust the bitrate as needed
     codec->audio_encoder_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP; // or AV_SAMPLE_FMT_S16P
     codec->audio_encoder_ctx->sample_rate = 44100; // Adjust the sample rate as needed
-    codec->audio_encoder_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
+    //codec->audio_encoder_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
         
     if (avcodec_open2(codec->audio_encoder_ctx, codec->audio_encoder, NULL) < 0) {
         printf("Error: Failed to open audio encoder codec.\n");

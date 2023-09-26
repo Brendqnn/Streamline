@@ -55,6 +55,7 @@ SLwindow *create_window(int width, int height, const char *title, SLio *io) {
 
     sl_window->button = gtk_button_new_with_label("Start");
     g_signal_connect(sl_window->button, "clicked", G_CALLBACK(on_button_clicked), sl_window);
+    
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_box_pack_start(GTK_BOX(box), sl_window->button, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(sl_window->event_box), box);

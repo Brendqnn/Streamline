@@ -54,7 +54,7 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
 
 void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
-    const int max_batch_size = 8;
+    const int max_batch_size = 6;
 
     AVPacket *packet_batch[max_batch_size];
     AVFrame *frame_batch[max_batch_size];
@@ -82,7 +82,7 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 
                 if (frame_count >= max_batch_size) {
                     process_batch(codec, io, packet_batch, frame_batch, frame_count);
-                    frame_count = 0;
+                     frame_count = 0;
                 }
             }
         } else if (compressor->packet.stream_index == codec->audio_stream_idx) {

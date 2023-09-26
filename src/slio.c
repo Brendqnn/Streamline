@@ -68,9 +68,6 @@ void remove_queue_node(SLio *io)
     SLqueue *queue = io->queue;
     if (queue != NULL) {
         remove_node(&queue);
-        
-        printf("node successfully freed.\n");
-        
     }
 }
 
