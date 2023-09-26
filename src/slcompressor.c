@@ -17,7 +17,7 @@ SLcompressor *init_compressor(SLio *io, SLcodec *codec) {
 void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
     if (codec == NULL || io == NULL) {
-        printf("Error: Failed to setup compressor. Codec and or io pointers are NULL.\n");
+        fprintf(stderr, "Error: Failed to setup compressor. Codec and or io pointers are NULL.\n");
         return;
     }
 
@@ -54,7 +54,7 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
 
 void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
-    const int max_batch_size = 6;
+    const int max_batch_size = 8;
 
     AVPacket *packet_batch[max_batch_size];
     AVFrame *frame_batch[max_batch_size];
@@ -105,6 +105,7 @@ void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
     if (compressor != NULL) {
         av_frame_free(&compressor->frame);
+        remove_queue_node(io);
         free_io(io);
         free_codec(codec);
         free(compressor);

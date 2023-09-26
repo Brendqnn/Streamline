@@ -12,7 +12,7 @@ typedef struct SLqueue {
 
 SLqueue *create_node(const char *data);
 void insert_node(SLqueue **head, const char *data);
-void remove_node(SLqueue **head, const char *data);
+void remove_node(SLqueue **head);
 void display_list(SLqueue *queue);
 
 #endif // SLQUEUE_H

@@ -4,8 +4,8 @@ void on_button_clicked(GtkWidget *button, gpointer user_data)
 {
     SLwindow *sl_window = (SLwindow*)user_data;
     SLcodec *codec = init_codec(sl_window->io);
-    
     SLcompressor *compressor = init_compressor(sl_window->io, codec);
+    
     compressor_setup(compressor, codec, sl_window->io);
     compress(compressor, codec, sl_window->io);
     free_compressor(compressor, codec, sl_window->io);
@@ -39,8 +39,6 @@ SLwindow *create_window(int width, int height, const char *title, SLio *io) {
      }
     
     sl_window->io = io;
-    
-    //gtk_init(NULL, NULL);
     
     sl_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(sl_window->window), title);

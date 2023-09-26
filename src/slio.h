@@ -8,6 +8,8 @@
 
 typedef struct {
     const char *input_media_filename;
+    const char *output_media_filename;
+    const char *output_media_filename_temp;
     const char *output_tag;
     
     AVFormatContext *input_ctx;
@@ -21,6 +23,7 @@ void open_media_input(SLio *io);
 void write_file_header(SLio *io);
 void alloc_output_ctx(SLio *io);
 void load_input(SLio *io);
+void create_output(SLio *io);
 void remove_queue_node(SLio *io);
 void free_io(SLio *io);
 

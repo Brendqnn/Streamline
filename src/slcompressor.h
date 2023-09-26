@@ -12,10 +12,9 @@
 #include "slcodec.h"
 
 typedef struct SLcompressor {
-    AVFrame *frame;
+    AVFrame *frame; 
     AVPacket packet;
-    //AVPacket audio_packet;
-
+    
     SLio *io;
     SLcodec *codec;
 } SLcompressor;

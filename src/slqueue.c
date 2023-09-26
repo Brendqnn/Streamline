@@ -25,7 +25,7 @@ void insert_node(SLqueue **head, const char* data)
     *head = new_node;
 }
 
-void remove_node(SLqueue **head, const char* data)
+void remove_node(SLqueue **head)
 {
     if (*head != NULL) {
         SLqueue *temp = *head;
@@ -43,6 +43,4 @@ void display_list(SLqueue *queue)
     }
     printf("NULL\n");
 }
-
-
 
