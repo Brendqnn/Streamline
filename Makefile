@@ -1,18 +1,18 @@
 ## DEBUG 
-DEBUG_FLAGS = -Wall -g 
+DEBUG_FLAGS = -Wall -g $(shell pkg-config --cflags gtk+-3.0)
 ## RELEASE
-RELEASE_FLAGS = -O3 
+RELEASE_FLAGS = -O3 $(shell pkg-config --cflags gtk+-3.0)
 
-LDFLAGS = -lavformat -lavcodec -lavutil -lswscale -lraylib -lm -lpthread -ldl -lX11
+LDFLAGS = $(shell pkg-config --libs gtk+-3.0) -lavformat -lavcodec -lavutil -lswscale
 
-DEBUG_RUN_COMMAND = bin/debug/main
-RELEASE_RUN_COMMAND = bin/release/main
+DEBUG_RUN_COMMAND = bin/debug/main.exe
+RELEASE_RUN_COMMAND = bin/release/main.exe
 
 SOURCES = $(wildcard src/*.c)
 DEBUG_OBJECTS = $(patsubst src/%.c, bin/debug/%.o, $(SOURCES))
 RELEASE_OBJECTS = $(patsubst src/%.c, bin/release/%.o, $(SOURCES))
-DEBUG_EXECUTABLE = bin/debug/main
-RELEASE_EXECUTABLE = bin/release/main
+DEBUG_EXECUTABLE = bin/debug/main.exe
+RELEASE_EXECUTABLE = bin/release/main.exe
 
 all: debug release
 

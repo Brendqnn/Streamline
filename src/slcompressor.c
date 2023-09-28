@@ -100,7 +100,6 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 
     av_write_trailer(io->output_ctx);
     remove_queue_node(io);
-    
 }
 
 void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io)

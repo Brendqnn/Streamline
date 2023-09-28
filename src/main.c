@@ -1,39 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <gtk/gtk.h>
 #include "../include/util.h"
-#define RAYLIB_IMPLEMENTATION
-#include "../include/raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#include "../include/raygui.h"
-
+#include "slwindow.h"
 #include "slio.h"
 
 
-int main(void) {
-    InitWindow(WINDOW_HEIGHT, WINDOW_WIDTH, "Streamline v1.0");
+int main(int argc, char *argv[]) {
+    gtk_init(&argc, &argv);
 
-    Rectangle box = {100, 100, 100, 100}; // Initial box position and size
-    bool isDragging = false;
-    Vector2 offset = {0, 0};
-
-    SetTargetFPS(60);
-
-    while (!WindowShouldClose()) {
-        
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        if (GuiButton((Rectangle){10, 10, 120, 40}, "Start")) {
-            
-        }
-
-        DrawRectangleRec(box, RED);
-
-        EndDrawing();
-    }
+    SLio *io = init_io();
+    SLwindow *window = create_window(WINDOW_HEIGHT, WINDOW_WIDTH, "Streamline-v1.0", io);
     
-    CloseWindow();
+    show_window(window);
+    //destroy_window(window);
     return 0;
 }
 
