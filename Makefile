@@ -1,9 +1,9 @@
 ## DEBUG 
-DEBUG_FLAGS = -Wall -g $(shell pkg-config --cflags gtk+-3.0)
+DEBUG_FLAGS = -Wall -g 
 ## RELEASE
-RELEASE_FLAGS = -O3 $(shell pkg-config --cflags gtk+-3.0)
+RELEASE_FLAGS = -O3 
 
-LDFLAGS = $(shell pkg-config --libs gtk+-3.0) -lavformat -lavcodec -lavutil -lswscale
+LDFLAGS = -lavformat -lavcodec -lavutil -lswscale -lraylib -lm -lpthread -ldl -lX11
 
 DEBUG_RUN_COMMAND = bin/debug/main
 RELEASE_RUN_COMMAND = bin/release/main

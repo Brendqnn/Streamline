@@ -68,6 +68,7 @@ void remove_queue_node(SLio *io)
     SLqueue *queue = io->queue;
     if (queue != NULL) {
         remove_node(&queue);
+        display_list(queue);
     }
 }
 

@@ -99,13 +99,14 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
     }
 
     av_write_trailer(io->output_ctx);
+    remove_queue_node(io);
+    
 }
 
 void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
     if (compressor != NULL) {
         av_frame_free(&compressor->frame);
-        remove_queue_node(io);
         free_io(io);
         free_codec(codec);
         free(compressor);
