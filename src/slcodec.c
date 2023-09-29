@@ -104,11 +104,11 @@ void set_encoder_properties(SLcodec *codec)
     codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
     codec->video_encoder_ctx->rc_buffer_size = 8000000;
     
-    //Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
-    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "14", 0);
+    // Set CRF (Constant Rate Factor) for VBR mode (e.g., CRF 23 for moderate quality)
+    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "10", 0);
     av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "veryfast", 0);
     
-    //Set other properties like resolution, framerate, etc.
+    // Set other properties like resolution, framerate, etc.
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
     codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
