@@ -4,3 +4,5 @@
 
 #define WINDOW_HEIGHT 1200
 #define WINDOW_WIDTH 800
+
+#define MAX_BATCH_SIZE 12

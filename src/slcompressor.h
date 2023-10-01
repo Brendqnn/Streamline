@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <libavcodec/avcodec.h>
 #include <libavcodec/codec.h>
 #include <libavformat/avformat.h>
@@ -10,8 +11,9 @@
 
 #include "slio.h"
 #include "slcodec.h"
+#include "../include/util.h"
 
-typedef struct SLcompressor {
+typedef struct {
     AVFrame *frame; 
     AVPacket packet;
     

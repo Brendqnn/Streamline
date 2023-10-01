@@ -4,10 +4,7 @@ SLcompressor *init_compressor(SLio *io, SLcodec *codec) {
     SLcompressor *compressor = malloc(sizeof(SLcompressor));
     
     compressor->frame = av_frame_alloc();
-        
-    compressor->packet.data = NULL;
-    compressor->packet.size = 0;
-
+    
     compressor->io = io;
     compressor->codec = codec;
     
@@ -20,7 +17,7 @@ void compressor_setup(SLcompressor *compressor, SLcodec *codec, SLio *io)
         fprintf(stderr, "Error: Failed to setup compressor. Codec and or io pointers are NULL.\n");
         return;
     }
-
+    
     load_input(io);
     open_media_input(io);
     find_media_streams(codec, io);
@@ -44,7 +41,6 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
                 break;
             }
         }
-        
         av_packet_unref(packet_batch[i]);
         av_frame_unref(frame_batch[i]);
         av_packet_free(&packet_batch[i]);
@@ -54,12 +50,15 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
 
 void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 {
-    const int max_batch_size = 6;
-
-    AVPacket *packet_batch[max_batch_size];
-    AVFrame *frame_batch[max_batch_size];
+    AVPacket *packet_batch[MAX_BATCH_SIZE];
+    AVFrame *frame_batch[MAX_BATCH_SIZE];
 
     int frame_count = 0;
+
+    clock_t start_time, end_time;
+    double elapsed_time;
+    
+    start_time = clock();
 
     while (av_read_frame(io->input_ctx, &compressor->packet) >= 0) {
         if (compressor->packet.stream_index == codec->video_stream_idx) {
@@ -80,9 +79,9 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
                 av_packet_ref(packet_batch[frame_count], &compressor->packet);
                 frame_count++;
 
-                if (frame_count >= max_batch_size) {
+                if (frame_count >= MAX_BATCH_SIZE) {
                     process_batch(codec, io, packet_batch, frame_batch, frame_count);
-                     frame_count = 0;
+                    frame_count = 0;
                 }
             }
         } else if (compressor->packet.stream_index == codec->audio_stream_idx) {
@@ -100,6 +99,10 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 
     av_write_trailer(io->output_ctx);
     remove_queue_node(io);
+    end_time = clock();
+    elapsed_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    
+    printf("Total time taken: %f seconds\n", elapsed_time);
 }
 
 void free_compressor(SLcompressor *compressor, SLcodec *codec, SLio *io)
