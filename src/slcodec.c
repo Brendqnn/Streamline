@@ -20,7 +20,6 @@ SLcodec *init_codec(SLio *io)
     codec->input_video_framerate = (AVRational) {0, 0}; // Initialize as 0/0
     codec->video_stream_idx = -1; // Initialize to -1
     codec->audio_stream_idx = -1; // Initialize to -1
-
     codec->io = io;
         
     return codec;
@@ -44,12 +43,10 @@ void find_media_streams(SLcodec *codec, SLio *io)
         printf("Error: Audio stream index not found.\n");
         return;
     }
+    
     codec->input_video_stream = io->input_ctx->streams[codec->video_stream_idx];
     codec->input_audio_stream = io->input_ctx->streams[codec->audio_stream_idx];
     codec->input_video_framerate = codec->input_video_stream->r_frame_rate;
-    printf("Input Video Framerate: %d/%d\n",
-    codec->input_video_framerate.num,
-    codec->input_video_framerate.den);
 }
 
 void open_decoder_ctx(SLcodec *codec)
@@ -61,7 +58,7 @@ void open_decoder_ctx(SLcodec *codec)
         return;
     }
     codec->video_decoder_ctx->thread_type = FF_THREAD_FRAME;
-    codec->video_decoder_ctx->thread_count = 2;
+    codec->video_decoder_ctx->thread_count = 1;
     if (avcodec_open2(codec->video_decoder_ctx, codec->video_decoder, NULL) < 0) {
         printf("Error: Failed to open video decoder codec.\n");
         return;
@@ -97,50 +94,31 @@ void open_audio_decoder_ctx(SLcodec *codec)
 
 void set_encoder_properties(SLcodec *codec)
 {
-    codec->video_encoder_ctx->rc_max_rate = 10000000;  // Higher bitrate for better quality
+    codec->video_encoder_ctx->rc_max_rate = 10000000; // 1 Mbps
     codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
     codec->video_encoder_ctx->rc_buffer_size = 10000000;
 
-    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "14", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "13", 0); // 23 moderate
     av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "veryfast", 0);
-
+   
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
-    codec->video_encoder_ctx->pix_fmt = 0;
+    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // Set the pixel format to YUV420P
     codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
     codec->video_encoder_ctx->framerate = codec->input_video_framerate;
 
     codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
-    codec->video_encoder_ctx->thread_count = 2;
-}
+    codec->video_encoder_ctx->thread_count = 1;
 
-void set_nvenc_encoder_properties(SLcodec *codec)
-{
-    codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
-    codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
-
-    printf("Width: %d\n", codec->video_encoder_ctx->width); // Print width
-    printf("Height: %d\n", codec->video_encoder_ctx->height); // Print height
-
-    codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
-    codec->video_encoder_ctx->framerate = codec->input_video_framerate;
-    
-    printf("Time Base: %d/%d\n", codec->video_encoder_ctx->time_base.num, codec->video_encoder_ctx->time_base.den); // Print time base
-    printf("Frame Rate: %d/%d\n", codec->video_encoder_ctx->framerate.num, codec->video_encoder_ctx->framerate.den); // Print frame rate
-
-    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_NV12;
-    
-    codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE;
-    codec->video_encoder_ctx->thread_count = 2;
+    //codec->video_encoder_ctx->hwaccel_flags = codec->hw_type;
 }
 
 void open_encoder_ctx(SLcodec *codec)
 {
-    //codec->video_encoder = avcodec_find_encoder(codec->input_video_stream->codecpar->codec_id);
-    codec->video_encoder = avcodec_find_encoder_by_name("h264_nvenc");
+    codec->video_encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
     codec->video_encoder_ctx = avcodec_alloc_context3(codec->video_encoder);
-    //set_encoder_properties(codec);
-    set_nvenc_encoder_properties(codec);
+    set_encoder_properties(codec);
+
     if (avcodec_open2(codec->video_encoder_ctx, codec->video_encoder, NULL) < 0) {
         printf("Error: Failed to open encoder codec.\n");
         return;

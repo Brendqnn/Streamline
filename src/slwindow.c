@@ -3,13 +3,6 @@
 void on_button_clicked(GtkWidget *button, gpointer user_data)
 {
     SLwindow *sl_window = (SLwindow*)user_data;
-
-    SLqueue *current = sl_window->io->queue;
-    if (current == NULL) {
-        fprintf(stderr, "Error: The queue is currently empty.\n");
-        return;
-    }
-    
     SLcodec *codec = init_codec(sl_window->io);
     SLcompressor *compressor = init_compressor(sl_window->io, codec);
     
@@ -28,13 +21,12 @@ void on_drag_data_received(GtkWidget *widget, GdkDragContext *context, gint x, g
         for (GList *iter = uris_list; iter != NULL; iter = iter->next) {
             const char *uri = iter->data;
             const char *filepath = g_filename_from_uri(uri, NULL, NULL);
-
+            
             if (filepath != NULL) {
                 printf("Dropped file: %s\n", filepath);
                 insert_node(&sl_window->io->queue, filepath);
             }
         }
-        g_list_free(uris_list);
     }
 }
 
@@ -46,7 +38,7 @@ SLwindow *create_window(int width, int height, const char *title, SLio *io) {
     }
 
     sl_window->io = io;
-
+    
     sl_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(sl_window->window), title);
     gtk_window_set_default_size(GTK_WINDOW(sl_window->window), width, height);

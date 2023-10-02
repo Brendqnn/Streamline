@@ -68,7 +68,7 @@ void remove_queue_node(SLio *io)
     SLqueue *queue = io->queue;
     if (queue != NULL) {
         remove_node(&queue);
-        display_list(queue);
+        printf("node successfully freed.\n");
     }
 }
 
@@ -83,14 +83,17 @@ void create_output(SLio *io)
     
     if (last_slash != NULL) {
         io->output_media_filename_temp = last_slash + 1;
-        size_t length = strlen(io->output_tag) + strlen(io->output_media_filename_temp + 1);
-        const char *result = malloc(length);
+        size_t length = strlen(io->output_tag) + strlen(io->output_media_filename_temp) + 1; // +1 for null-terminator
+        char *result = malloc(length);
         
-        strcpy(result, io->output_tag);
-        strcat(result, io->output_media_filename_temp);
-
         if (result != NULL) {
+            strcpy(result, io->output_tag);
+            strcat(result, io->output_media_filename_temp);
+            
             io->output_media_filename = result;
+            //free(result);
+        } else {
+            fprintf(stderr, "Error: Failed to allocate memory for output filename.\n");
         }
     }
 }

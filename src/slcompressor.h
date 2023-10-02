@@ -11,7 +11,9 @@
 
 #include "slio.h"
 #include "slcodec.h"
+#include "slcompressor.h"
 #include "../include/util.h"
+
 
 typedef struct {
     AVFrame *frame; 

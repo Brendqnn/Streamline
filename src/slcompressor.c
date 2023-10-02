@@ -1,5 +1,6 @@
 #include "slcompressor.h"
 
+
 SLcompressor *init_compressor(SLio *io, SLcodec *codec) {
     SLcompressor *compressor = malloc(sizeof(SLcompressor));
     
@@ -37,7 +38,7 @@ void process_batch(SLcodec *codec, SLio *io, AVPacket **packet_batch, AVFrame **
         }
         while (avcodec_receive_packet(codec->video_encoder_ctx, packet_batch[i]) >= 0) {
             if (av_interleaved_write_frame(io->output_ctx, packet_batch[i]) < 0) {
-                printf("Error: Error writing video frame to output.\n");
+                printf("Error: Failed writing video frame to output.\n");
                 break;
             }
         }
@@ -57,7 +58,6 @@ void compress(SLcompressor *compressor, SLcodec *codec, SLio *io)
 
     clock_t start_time, end_time;
     double elapsed_time;
-    
     start_time = clock();
 
     while (av_read_frame(io->input_ctx, &compressor->packet) >= 0) {

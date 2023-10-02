@@ -4,13 +4,13 @@
 #include <gtk/gtk.h>
 #include "slqueue.h"
 #include "slio.h"
+#include "slcodec.h"
 #include "slcompressor.h"
 
 typedef struct {
     GtkWidget *window;
     
     SLio *io;
-    SLcompressor *compressor;
 } SLwindow;
 
 SLwindow *create_window(int height, int width, const char *title, SLio *io);

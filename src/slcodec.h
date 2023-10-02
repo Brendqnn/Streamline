@@ -9,7 +9,7 @@
 #include <libavformat/avformat.h>
 #include <libavutil/avutil.h>
 #include <libavutil/opt.h>
-#include <libavutil/channel_layout.h>
+#include <libavutil/hwcontext.h>
 
 #include "slio.h"
 
@@ -36,7 +36,7 @@ typedef struct {
 
     int video_stream_idx;
     int audio_stream_idx;
-
+    
     SLio *io;
 } SLcodec;
 
