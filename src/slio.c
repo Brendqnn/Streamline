@@ -83,7 +83,7 @@ void create_output(SLio *io)
     
     if (last_slash != NULL) {
         io->output_media_filename_temp = last_slash + 1;
-        size_t length = strlen(io->output_tag) + strlen(io->output_media_filename_temp) + 1; // +1 for null-terminator
+        size_t length = strlen(io->output_tag) + strlen(io->output_media_filename_temp) + 1;
         char *result = malloc(length);
         
         if (result != NULL) {
@@ -91,7 +91,6 @@ void create_output(SLio *io)
             strcat(result, io->output_media_filename_temp);
             
             io->output_media_filename = result;
-            //free(result);
         } else {
             fprintf(stderr, "Error: Failed to allocate memory for output filename.\n");
         }

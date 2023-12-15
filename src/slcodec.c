@@ -65,59 +65,41 @@ void open_decoder_ctx(SLcodec *codec)
     }
 }
 
-void open_audio_decoder_ctx(SLcodec *codec)
+void set_encoder_prop(SLcodec *codec)
 {
-    if (codec->audio_stream_idx == -1) {
-        printf("Error: Audio stream index not found.\n");
-        return;
-    }
-    codec->audio_decoder = avcodec_find_decoder(codec->input_audio_stream->codecpar->codec_id);
-    if (!codec->audio_decoder) {
-        printf("Error: Failed to find audio decoder.\n");
-        return;
-    }
-    // Initialize audio decoder context
-    codec->audio_decoder_ctx = avcodec_alloc_context3(codec->audio_decoder);
-    if (!codec->audio_decoder_ctx) {
-        printf("Error: Failed to allocate audio decoder context.\n");
-        return;
-    }
-    if (avcodec_parameters_to_context(codec->audio_decoder_ctx, codec->input_audio_stream->codecpar) < 0) {
-        printf("Error: Failed to copy audio codec context to parameters.\n");
-        return;
-    }
-    if (avcodec_open2(codec->audio_decoder_ctx, codec->audio_decoder, NULL) < 0) {
-        printf("Error: Failed to open audio decoder codec.\n");
-        return;
-    }
-}
-
-void set_encoder_properties(SLcodec *codec)
-{
-    codec->video_encoder_ctx->rc_max_rate = 10000000; // 1 Mbps
-    codec->video_encoder_ctx->rc_min_rate = 0;  // Minimum bitrate (0 for auto)
-    codec->video_encoder_ctx->rc_buffer_size = 10000000;
-
-    av_opt_set(codec->video_encoder_ctx->priv_data, "crf", "13", 0); // 23 moderate
-    av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "veryfast", 0);
-   
     codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
     codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
-    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // Set the pixel format to YUV420P
+    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
     codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
-    codec->video_encoder_ctx->framerate = codec->input_video_framerate;
-
+    
     codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
     codec->video_encoder_ctx->thread_count = 1;
+}
 
-    //codec->video_encoder_ctx->hwaccel_flags = codec->hw_type;
+void set_nvenc_encoder_prop(SLcodec *codec)
+{
+    av_opt_set(codec->video_encoder_ctx->priv_data, "preset", "default", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "profile", "main", 0);
+    av_opt_set(codec->video_encoder_ctx->priv_data, "tune", "zerolatency", 0);
+    
+    codec->video_encoder_ctx->bit_rate = 4000000; 
+    codec->video_encoder_ctx->width = codec->video_decoder_ctx->width;
+    codec->video_encoder_ctx->height = codec->video_decoder_ctx->height;
+    codec->video_encoder_ctx->pix_fmt = AV_PIX_FMT_NV12;
+    codec->video_encoder_ctx->time_base = codec->input_video_stream->time_base;
+    codec->video_encoder_ctx->gop_size = 10;
+    codec->video_encoder_ctx->max_b_frames = 2;
+    
+    codec->video_encoder_ctx->thread_type = FF_THREAD_SLICE; // Enable slice-level multithreading
+    codec->video_encoder_ctx->thread_count = 1;
 }
 
 void open_encoder_ctx(SLcodec *codec)
 {
-    codec->video_encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
+    //codec->video_encoder = avcodec_find_encoder(AV_CODEC_ID_H264);
+    codec->video_encoder = avcodec_find_encoder_by_name("h264_nvenc");
     codec->video_encoder_ctx = avcodec_alloc_context3(codec->video_encoder);
-    set_encoder_properties(codec);
+    set_nvenc_encoder_prop(codec);
 
     if (avcodec_open2(codec->video_encoder_ctx, codec->video_encoder, NULL) < 0) {
         printf("Error: Failed to open encoder codec.\n");
@@ -125,31 +107,6 @@ void open_encoder_ctx(SLcodec *codec)
     }
 }
 
-void open_audio_encoder_ctx(SLcodec *codec)
-{
-    codec->audio_encoder = avcodec_find_encoder(AV_CODEC_ID_AAC);
-    if (!codec->audio_encoder) {
-        printf("Error: Failed to find audio encoder.\n");
-        return;
-    }
-    
-    codec->audio_encoder_ctx = avcodec_alloc_context3(codec->audio_encoder);
-    if (!codec->audio_encoder_ctx) {
-        printf("Error: Failed to allocate audio encoder context.\n");
-        return;
-    }
-    
-    codec->audio_encoder_ctx->bit_rate = 128000; // Adjust the bitrate as needed
-    codec->audio_encoder_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP; // or AV_SAMPLE_FMT_S16P
-    codec->audio_encoder_ctx->sample_rate = 44100; // Adjust the sample rate as needed
-    //codec->audio_encoder_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
-        
-    if (avcodec_open2(codec->audio_encoder_ctx, codec->audio_encoder, NULL) < 0) {
-        printf("Error: Failed to open audio encoder codec.\n");
-        return;
-    }
-}
- 
 void copy_audio_parameters(SLcodec *codec, SLio *io)
 {
     codec->output_audio_stream = avformat_new_stream(io->output_ctx, NULL);

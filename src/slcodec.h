@@ -48,7 +48,7 @@ void open_audio_decoder_ctx(SLcodec *codec);
 void open_audio_encoder_ctx(SLcodec *codec);
 void copy_audio_parameters(SLcodec *codec, SLio *io);
 void stream_to_output(SLcodec *codec, SLio *io);
-void set_encoder_properties(SLcodec *codec);
+void set_encoder_prop(SLcodec *codec);
 void stream_to_output(SLcodec *codec, SLio *io);
 void free_codec(SLcodec *codec);
 

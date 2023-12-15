@@ -1,7 +1,8 @@
 #include "slcompressor.h"
 
 
-SLcompressor *init_compressor(SLio *io, SLcodec *codec) {
+SLcompressor *init_compressor(SLio *io, SLcodec *codec)
+{
     SLcompressor *compressor = malloc(sizeof(SLcompressor));
     
     compressor->frame = av_frame_alloc();
